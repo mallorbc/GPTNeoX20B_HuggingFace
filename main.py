@@ -1,7 +1,6 @@
 import torch
-from transformers import GPTNeoXForCausalLM, GPTNeoXTokenizerFast
 from accelerate import init_empty_weights, infer_auto_device_map, load_checkpoint_and_dispatch
-from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer, AutoModelForSeq2SeqLM
+from transformers import AutoConfig, AutoModelForCausalLM, AutoTokenizer
 import os
 import argparse
 
@@ -26,14 +25,24 @@ def main(fp16:bool=False,bf16:bool=False):
 
     device_map = infer_auto_device_map(model, no_split_module_classes=["GPTNeoXLayer"],dtype=torch.bfloat16)
 
-    load_checkpoint_and_dispatch(
-        model,
-        weights_path,
-        device_map=device_map,
-        offload_folder=None,
-        offload_state_dict=False,
-        dtype="bfloat16"
-    )
+    if torch.cuda.is_bf16_supported():
+        load_checkpoint_and_dispatch(
+            model,
+            weights_path,
+            device_map=device_map,
+            offload_folder=None,
+            offload_state_dict=False,
+            dtype="bfloat16"
+        )
+    else:
+        load_checkpoint_and_dispatch(
+            model,
+            weights_path,
+            device_map=device_map,
+            offload_folder=None,
+            offload_state_dict=False,
+            dtype="float16"
+        )
 
 
 
