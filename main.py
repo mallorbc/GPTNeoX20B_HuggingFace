@@ -23,9 +23,9 @@ def main(fp16:bool=False,bf16:bool=False):
 
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
-    device_map = infer_auto_device_map(model, no_split_module_classes=["GPTNeoXLayer"],dtype=torch.bfloat16)
 
     if torch.cuda.is_bf16_supported():
+        device_map = infer_auto_device_map(model, no_split_module_classes=["GPTNeoXLayer"],dtype=torch.bfloat16)
         load_checkpoint_and_dispatch(
             model,
             weights_path,
@@ -35,6 +35,7 @@ def main(fp16:bool=False,bf16:bool=False):
             dtype="bfloat16"
         )
     else:
+        device_map = infer_auto_device_map(model, no_split_module_classes=["GPTNeoXLayer"],dtype=torch.float16)
         load_checkpoint_and_dispatch(
             model,
             weights_path,
