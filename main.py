@@ -25,21 +25,21 @@ def main(fp16:bool=False,bf16:bool=False):
 
 
     if torch.cuda.is_bf16_supported():
-        device_map = infer_auto_device_map(model, no_split_module_classes=["GPTNeoXLayer"],dtype=torch.bfloat16)
         load_checkpoint_and_dispatch(
             model,
             weights_path,
-            device_map=device_map,
+            device_map="auto",
+            no_split_module_classes=["GPTNeoXLayer"]
             offload_folder=None,
             offload_state_dict=False,
             dtype="bfloat16"
         )
     else:
-        device_map = infer_auto_device_map(model, no_split_module_classes=["GPTNeoXLayer"],dtype=torch.float16)
         load_checkpoint_and_dispatch(
             model,
             weights_path,
-            device_map=device_map,
+            device_map="auto",
+            no_split_module_classes=["GPTNeoXLayer"]
             offload_folder=None,
             offload_state_dict=False,
             dtype="float16"
